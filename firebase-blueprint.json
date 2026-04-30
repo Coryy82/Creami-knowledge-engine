@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "Recipe": {
+      "title": "Recipe",
+      "description": "Structured ice cream recipe extracted from a video",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "youtubeId": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "ingredients": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["title", "youtubeId", "ingredients", "steps", "userId"]
+    },
+    "VideoSource": {
+      "title": "VideoSource",
+      "description": "Log of processed videos to avoid duplication",
+      "type": "object",
+      "properties": {
+        "youtubeId": { "type": "string" },
+        "status": { "type": "string", "enum": ["processing", "completed", "failed"] },
+        "error": { "type": "string" },
+        "userId": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["youtubeId", "status", "userId"]
+    }
+  },
+  "firestore": {
+    "recipes": {
+      "schema": "Recipe",
+      "description": "User extracted recipes"
+    },
+    "users/{userId}/video_sources": {
+      "schema": "VideoSource",
+      "description": "Personal tracking of processed videos"
+    }
+  }
+}

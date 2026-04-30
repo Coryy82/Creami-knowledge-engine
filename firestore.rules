@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isLocalUser(userId) { return userId == 'local-user'; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    function isValidRecipe(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.youtubeId is string && data.youtubeId.size() <= 50 &&
+             data.ingredients is list && data.ingredients.size() <= 100 &&
+             data.steps is list && data.steps.size() <= 100 &&
+             isLocalUser(data.userId);
+    }
+
+    match /recipes/{recipeId} {
+      allow create: if isValidId(recipeId) && isValidRecipe(request.resource.data);
+      allow list, get: if isLocalUser(resource.data.userId);
+      allow update: if isValidRecipe(request.resource.data) &&
+                      request.resource.data.userId == resource.data.userId &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'ingredients', 'steps', 'notes', 'category']);
+      allow delete: if isLocalUser(resource.data.userId);
+    }
+
+    match /users/{userId}/video_sources/{videoId} {
+      allow read, write: if isLocalUser(userId);
+    }
+  }
+}

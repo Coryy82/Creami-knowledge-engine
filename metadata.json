@@ -1,0 +1,6 @@
+{
+  "name": "Creami Knowledge Engine",
+  "description": "Enterprise-grade YouTube recipe extraction and RAG advisor. Process entire channels into a semantic recipe vault.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
